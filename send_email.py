@@ -53,7 +53,7 @@ def main():
     service = get_gmail_service()
     
     # Email details
-    sender = "chrism36@bu.edu"  # Replace with your Gmail address
+    sender = input("Enter your email")  # Replace with your Gmail address
     to = input("Enter the recipient's email: ")      # Replace with recipient's email
     subject = input("Enter the subject: ")
     message_text = input("Enter the message: ")
