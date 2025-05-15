@@ -23,7 +23,7 @@ def get_gmail_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'client_secret_949886855243-pac5pff8qb4tl06atglkojujoknu3sfk.apps.googleusercontent.com.json', SCOPES)
+                'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         
         # Save the credentials for the next run
