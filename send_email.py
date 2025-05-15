@@ -6,6 +6,8 @@ import pickle
 import os.path
 import base64
 from email.mime.text import MIMEText
+import time
+import json
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -39,10 +41,11 @@ def create_message(sender, to, subject, message_text):
     message['subject'] = subject
     return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
-def send_message(service, user_id, message):
+def send_message(service, user_id, message, recipient_email):
     try:
         message = service.users().messages().send(userId=user_id, body=message).execute()
         print(f"Message Id: {message['id']}")
+        print(f"Email sent successfully to {recipient_email}!")
         return message
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -52,15 +55,28 @@ def main():
     # Get Gmail API service
     service = get_gmail_service()
     
-    # Email details
-    sender = input("Enter your email: ")  # Replace with your Gmail address
-    to = input("Enter the recipient's email: ")      # Replace with recipient's email
-    subject = input("Enter the subject: ")
-    message_text = input("Enter the message: ")
+    # Load JSON data
+    with open(input("Enter the path to the JSON file: "), 'r') as file:
+        data = json.load(file)
     
-    # Create and send email
-    message = create_message(sender, to, subject, message_text)
-    send_message(service, "me", message)
+    # Email details
+    sender = input("Enter your email: ") 
+    for entry in data:
+        to = entry['email']
+        # Use TikTok handle for personalization
+        first_name = entry['tiktok_handle']
+        subject = f"Social Media Campaign for {entry['song_title']}"
+        message_text = (
+            f"Hi {first_name},\n\n"
+            f"We came across your page from when you used {entry['song_title']} and love your content! "
+            f"We think you would be a great fit for our campaign with {entry['artist']} and {entry['song_title']}. "
+            f"How much do you charge for a 1x TikTok promo?\n\n"
+            f"Thank you,\n"
+            f"{entry['label']}"
+        )
+        message = create_message(sender, to, subject, message_text)
+        send_message(service, "me", message, to)
+        time.sleep(1)  # Wait for 1 second before sending the next email
 
 if __name__ == '__main__':
     main()
